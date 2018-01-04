@@ -18,16 +18,26 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class SimpleClient {
 
-    public static class Links extends GenericJson {
+    public static class Href {
+        @Key("href")
+        public String value;
 
+        @Override
+        public String toString() {
+            return "Href{" +
+                    "value='" + value + '\'' +
+                    '}';
+        }
     }
 
     public static class Entry extends GenericJson {
-
+        @Key("_links")
+        public Map<String,List<Href>> links;
     }
 
     public static class Embedded {
@@ -48,7 +58,7 @@ public class SimpleClient {
         @Key("_embedded")
         public Embedded embedded;
         @Key("_links")
-        public Links links;
+        public Map<String,List<Href>> links;
 
         @Override
         public String toString() {
@@ -109,5 +119,7 @@ public class SimpleClient {
         System.out.println("resource.embedded.entries = " + resource.embedded.entries);
         System.out.println("resource.embedded.entries.get(0) = " + resource.embedded.entries.get(0));
         System.out.println("resource.embedded.entries.get(0).get(\"navn\") = " + resource.embedded.entries.get(0).get("navn"));
+        System.out.println("resource.embedded.entries.get(0).links = " + resource.embedded.entries.get(0).links);
+        System.out.println("resource.embedded.entries.get(0).links.get(\"self\") = " + resource.embedded.entries.get(0).links.get("self"));
     }
 }
