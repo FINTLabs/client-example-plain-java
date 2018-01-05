@@ -11,15 +11,14 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.client.util.Key;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class SimpleClient {
 
@@ -70,6 +69,21 @@ public class SimpleClient {
         }
     }
 
+    public static class Navn {
+        public String fornavn;
+        public String mellomnavn;
+        public String etternavn;
+
+        @Override
+        public String toString() {
+            return "Navn{" +
+                    "fornavn='" + fornavn + '\'' +
+                    ", mellomnavn='" + mellomnavn + '\'' +
+                    ", etternavn='" + etternavn + '\'' +
+                    '}';
+        }
+    }
+
 
     public static void main(String[] args) throws IOException {
         Properties properties = System.getProperties();
@@ -102,7 +116,21 @@ public class SimpleClient {
         HttpResponse response = httpRequest.execute();
         System.out.println("response = " + response.getStatusCode());
 
-        //response.download(System.out);
+//        response.download(System.out);
+
+        DocumentContext context = JsonPath.parse(response.getContent());
+
+//        List<String> fornavn = context.read("$..navn.fornavn");
+//        System.out.println("fornavn = " + fornavn);
+//
+//        List<String> etternavn = context.read("$..navn.etternavn");
+//        System.out.println("etternavn = " + etternavn);
+
+        Navn[] navn = context.read("$..navn", Navn[].class);
+        System.out.println("navn = " + Arrays.toString(navn));
+
+        List<String> links = context.read("$.._links.self[0].href");
+        System.out.println("links = " + links);
 
 //        GenericJson jsonObject = response.parseAs(GenericJson.class);
 
@@ -110,16 +138,16 @@ public class SimpleClient {
 //        System.out.println("links = " + jsonObject.get("links"));
 //        System.out.println("content = " + jsonObject.get("embedded"));
 
-        Resource resource = response.parseAs(Resource.class);
-
-        System.out.println("resource = " + resource);
-        System.out.println("resource.totalItems = " + resource.totalItems);
-        System.out.println("resource.links = " + resource.links);
-        System.out.println("resource.embedded = " + resource.embedded);
-        System.out.println("resource.embedded.entries = " + resource.embedded.entries);
-        System.out.println("resource.embedded.entries.get(0) = " + resource.embedded.entries.get(0));
-        System.out.println("resource.embedded.entries.get(0).get(\"navn\") = " + resource.embedded.entries.get(0).get("navn"));
-        System.out.println("resource.embedded.entries.get(0).links = " + resource.embedded.entries.get(0).links);
-        System.out.println("resource.embedded.entries.get(0).links.get(\"self\") = " + resource.embedded.entries.get(0).links.get("self"));
+//        Resource resource = response.parseAs(Resource.class);
+//
+//        System.out.println("resource = " + resource);
+//        System.out.println("resource.totalItems = " + resource.totalItems);
+//        System.out.println("resource.links = " + resource.links);
+//        System.out.println("resource.embedded = " + resource.embedded);
+//        System.out.println("resource.embedded.entries = " + resource.embedded.entries);
+//        System.out.println("resource.embedded.entries.get(0) = " + resource.embedded.entries.get(0));
+//        System.out.println("resource.embedded.entries.get(0).get(\"navn\") = " + resource.embedded.entries.get(0).get("navn"));
+//        System.out.println("resource.embedded.entries.get(0).links = " + resource.embedded.entries.get(0).links);
+//        System.out.println("resource.embedded.entries.get(0).links.get(\"self\") = " + resource.embedded.entries.get(0).links.get("self"));
     }
 }
